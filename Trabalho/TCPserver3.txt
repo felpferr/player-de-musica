@@ -1,0 +1,20 @@
+# TCPserver.py
+# coding: utf-8
+
+import socket
+
+serverPort = 12000
+serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serverSocket.bind(('', serverPort))
+serverSocket.listen(0)
+
+print("The server is ready to receive")
+
+while True:
+    connectionSocket, addr = serverSocket.accept()
+    print("Conexão vinda de {}".format(addr))
+    message = connectionSocket.recv(2048)
+    print("{} ==> {}".format(addr, message.decode('utf-8')))
+    modifiedMessage = message.decode('utf-8').upper()
+    connectionSocket.send(modifiedMessage.split().encode('utf-8'))
+    connectionSocket.close()
