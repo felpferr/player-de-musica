@@ -5,7 +5,7 @@ import pygame as pg
 import requests
 import config as c
 
-serverName = '10.3.1.20'
+serverName = '127.0.0.1'
 serverPort = c.portaDefault
 
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -19,11 +19,16 @@ buffer = open('audio.mp3','rw')
 
 while True:
     audio = connectionSocket.recv(512)
-    if audio == 'EOF':
-        break
-    buffer.write(audio.decode('utf-8'))
-    if buffer.size() >= 1024:
-        pg.mixer.music.load(buffer)
+    audio = audio.decode('utf-8')
+    if audio = "Falso":
+        audioName = input("Música não encontrada!\nForneça uma nova:\nSair")
+        clientSocket.send(audioName.encode('utf-8'))
+    else:
+        #if audio == 'EOF':
+        #    break
+        buffer.write(audio)
+        if buffer.size() >= 1024:
+            pg.mixer.music.load(buffer)
             
 
 clientSocket.close()
