@@ -27,7 +27,7 @@ while True:
         #if audio == 'EOF':
         #    break
         buffer.write(audio)
-        if buffer.size() >= 2048:
+        if buffer.__sizeof__() >= 2048:
             pg.mixer.music.load(buffer)
             
 

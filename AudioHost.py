@@ -5,7 +5,7 @@ import threading
 import os
 import config as c
 
-serverPort = 12014
+serverPort = 12015
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serverSocket.bind(('', serverPort))
 serverSocket.listen(0)
@@ -50,7 +50,8 @@ def conexoes(connectionSocket, addr):
                         #Será usado se não conseguir integrar uma página html.
                         connectionSocket.close() 
                 else:
-                        connectionSocket.send("Falso".encode('utf-8'))
+                        falso = "Falso"
+                        connectionSocket.send(falso.encode('utf-8'))
                 #Escreve em uma lista auxiliar trechos do arquivo a serem enviados.
                 #aux = musica.readlines()
         
