@@ -11,25 +11,26 @@ serverPort = c.portaDefault
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
 
-req = requests.get('''Página referente à solicitação dos áudios''')
-audioName = input()
+#req = requests.get('''Página referente à solicitação dos áudios''')
+audioName = input("Forneça uma música:\n")
 
 clientSocket.send(audioName.encode('utf-8'))
-buffer = open('audio.mp3','rw')
+buffer = open('audio.mp3','a')
 
 while True:
-    audio = connectionSocket.recv(512)
+    audio = clientSocket.recv(1024)
     audio = audio.decode('utf-8')
-    if audio = "Falso":
+    if audio == "Falso":
         audioName = input("Música não encontrada!\nForneça uma nova:\nSair")
         clientSocket.send(audioName.encode('utf-8'))
     else:
         #if audio == 'EOF':
         #    break
         buffer.write(audio)
-        if buffer.size() >= 1024:
+        if buffer.size() >= 2048:
             pg.mixer.music.load(buffer)
             
 
+buffer.close()
 clientSocket.close()
 

@@ -5,12 +5,22 @@ import threading
 import os
 import config as c
 
-serverPort = 12000
+serverPort = 12014
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serverSocket.bind(('', serverPort))
 serverSocket.listen(0)
 
 print("The server is ready to receive")
+
+
+#função para verificar a existencia de um arquivo; Nome completo:verifica_existencia_arquivo.
+def vea(arq_nome):
+        for path , diretorios, arqs_names in os.walk(c.diretorio_default):
+                for music_name in arqs_names:
+                        if not arq_nome == music_name:
+                                return False
+                        else:
+                                return True
 
 def conexoes(connectionSocket, addr): 
         ''' 
@@ -19,17 +29,20 @@ def conexoes(connectionSocket, addr):
         while True:
 
                 print("Conexão estabelecida com {}".format(addr))
-                nameMusic = connectionSocket.recv(2048).decode('utf-8')
+                nameMusic = connectionSocket.recv(2048)
+                nameMusic = nameMusic.decode('utf-8')
+                if nameMusic == "Sair":
+                        connectionSocket.close()
                 
-                if vea(nameMusic) = True:
-                        musica = open(os.path.expanduser('/home/felipe/Documentos/musicas/{}'.format(nameMusic)), 'r'),
-
-                        '''
+                if vea(nameMusic) == True:
+                        musica = open('/home/felipe/Documentos/musicas/{}'.format(nameMusic), 'r')
+                        '''os.path.expanduser(
                         Enviando cada linha do arquivo para o cliente.
                         Neste for a variável campos é iterada com o resultado de .readlines(), ou seja, este for será
                         executado até que cada linha do arquivo seja lida.
                         '''
                         for campos in musica.readlines():
+                                print(campos)
                                 connectionSocket.send(campos.encode('utf-8'))    
         
                         musica.close()
@@ -53,18 +66,3 @@ def main():
 
 if __name__ == '__main__':
 	main()
-
-
-#função para verificar a existencia de um arquivo; Nome completo:verifica_existencia_arquivo.
-def vea(arq_nome):
-        for path , diretorios, arqs_names in c.diretorio_default:
-                for music_name in arqs_names:
-                        if not arq_nome = music_name:
-                                return False
-                        else:
-                                return True
-                        
-                                
-
-
-                                
