@@ -23,6 +23,8 @@ while True:
     if audio == "Falso":
         audioName = input("Música não encontrada!\nForneça uma nova:\nSair")
         clientSocket.send(audioName.encode('utf-8'))
+        if audioName == "Sair":
+            clientSocket.close()
     else:
         #if audio == 'EOF':
         #    break

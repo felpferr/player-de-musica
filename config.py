@@ -1,6 +1,6 @@
 diretorio_default = '/home/felipe/Documentos/musicas'
 
-portaDefault = 12015
+portaDefault = 12017
 
 def obterDiretorioDeUsuario():
     # Obtém o caminho completo do diretorio usado no compartilhamento

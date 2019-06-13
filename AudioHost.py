@@ -5,7 +5,7 @@ import threading
 import os
 import config as c
 
-serverPort = 12015
+serverPort = 12017
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serverSocket.bind(('', serverPort))
 serverSocket.listen(0)
@@ -41,7 +41,8 @@ def conexoes(connectionSocket, addr):
                         Neste for a variável campos é iterada com o resultado de .readlines(), ou seja, este for será
                         executado até que cada linha do arquivo seja lida.
                         '''
-                        for campos in musica.readlines():
+
+                        for campos in musica.readline():
                                 print(campos)
                                 connectionSocket.send(campos.encode('utf-8'))    
         
