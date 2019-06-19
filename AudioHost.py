@@ -8,7 +8,7 @@ import config as c
 
 warnings.filterwarnings('ignore')
 
-serverPort = 12003
+serverPort = 12002
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serverSocket.bind(('', serverPort))
 serverSocket.listen(0)
@@ -20,10 +20,10 @@ print("The server is ready to receive")
 def vea(arq_nome):
         for path , diretorios, arqs_names in os.walk(c.diretorio_default):
                 for music_name in arqs_names:
-                        if arq_nome != music_name:
-                                return False
-                        else:
+                        if arq_nome == music_name:
                                 return True
+        
+        return False
 
 def conexoes(connectionSocket, addr): 
         ''' 
@@ -31,17 +31,16 @@ def conexoes(connectionSocket, addr):
         '''
         while True:
                 nameMusic = connectionSocket.recv(4096)
-                print(nameMusic)
                 nameMusic = nameMusic.decode('utf-8')
-                print(nameMusic)
 
                 if nameMusic == "Sair":
                         connectionSocket.close()
                 
                 resposta = vea(nameMusic)
+                print(resposta)
 
                 if resposta == True:
-                        musica = open('/home/aluno/Music/{}'.format(nameMusic), 'rb')
+                        musica = open('/home/felipe/Música/{}'.format(nameMusic), 'rb')
                         print(type(musica))
                         '''
                         Enviando cada linha do arquivo para o cliente.
@@ -49,6 +48,7 @@ def conexoes(connectionSocket, addr):
                         executado até que cada linha do arquivo seja lida.
                         '''
                         for linha in musica:
+                                #print(linha)
                                 connectionSocket.send(linha)    
 
                         musica.close()
@@ -57,8 +57,7 @@ def conexoes(connectionSocket, addr):
                 else:
                         falso = "Falso"
                         connectionSocket.send(falso.encode('utf-8'))
-                #Escreve em uma lista auxiliar trechos do arquivo a serem enviados.
-                #aux = musica.readlines()
+
                 break
                 
                 
