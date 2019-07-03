@@ -1,10 +1,11 @@
 #TCPclient
+#coding: utf-8
 
 import socket
-import pygame as pg
-import requests
 import config as c
 import threading
+import pyaudio
+from pydub import AudioSegment
 
 serverName = '127.0.0.1'
 serverPort = c.portaDefault
@@ -12,60 +13,53 @@ serverPort = c.portaDefault
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
 
+
 #Função para tocar a música.
 def play():
-    musica = open('audio.mp3','wb')
-    while True:
-        audio = clientSocket.recv(2048)
-        #print(audio)
-        if not audio: 
-            break   
-        musica.write(audio)
+        buffer = pyaudio.PyAudio()
+        
+        '''
+        Recebendo a taxa de reprodução do servidor caso a música exista;
+        O objeto Rate terá outra função que será armazenar uma resposta falso 
+        caso não haja uma música desejada, iniciando uma sub-tarefa voltando à tela
+        inicial.
+        '''
+        Rate = clientSocket.recv(1024).decode('utf-8')
+        
+        #if Rate == "Falso":
+        #        FP()
+                
 
-        pg.mixer.init()
-        if musica.__sizeof__() >= 4096:
-            pg.mixer.music.load(musica)
-            pg.mixer.music.play()	
+        stream = buffer.open(format=pyaudio.paInt32, channels=1, 
+        rate=int(Rate), frames_per_buffer=4096, output=True)
+        stream.start_stream()
+        
+        #Neste loop são adquidos pacotes que são reproduzidos pela stream de áudio
+        while True:
+                audio = clientSocket.recv(4096)
+                stream.write(audio)
+                if not audio:
+                    break
+                
+        stream.stop_stream()
+        stream.close()
+        buffer.terminate()
+        clientSocket.close()
 
 
 #FP = função de execução principal
 def FP():
-
     audioName = input("Forneça uma música:\n")
-            
+    
     clientSocket.send(audioName.encode('utf-8'))
-    #buffer = open('audio.mp3','wb')
 
-    '''
-    while True:
-
-        #Recebendo o arquivo neste loop.
-        while True:
-            audio = clientSocket.recv(2048)
-            #print(audio)
-            if not audio: 
-                break   
-            buffer.write(audio)
-        break
-    '''
-    th = threading.Thread(target=play)
-    th.start()
+    if audioName == "Sair":
+            clientSocket.shutdown(1)
+            clientSocket.close()
+    else:
+        play()
 
     clientSocket.close()
-    
-
-
-    #Criar uma forma de confirmar no cliente a msg de inexistência do arquivo.
-    '''if audio == "Falso":
-            audioName = input("Música não encontrada!\nForneça uma nova:\nSair!\n")
-            clientSocket.send(audioName.encode('utf-8'))
-            if audioName == "Sair":
-                clientSocket.close()
-        else:
-    '''	
-
-    buffer.close()
-#clientSocket.close()
 
 if __name__ == '__main__':
 	FP()

@@ -1,19 +1,22 @@
 #TCP_server
+#coding: utf-8
 
 import socket
 import threading
-import os
 import warnings
 import config as c
+import wave
+import time
+import os
 
 warnings.filterwarnings('ignore')
 
-serverPort = 12002
+serverPort = c.portaDefault
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serverSocket.bind(('', serverPort))
-serverSocket.listen(0)
+serverSocket.listen(1)
 
-print("The server is ready to receive")
+print("Servidor em execução")
 
 
 #função para verificar a existencia de um arquivo; Nome completo:verifica_existencia_arquivo.
@@ -25,47 +28,49 @@ def vea(arq_nome):
         
         return False
 
-def conexoes(connectionSocket, addr): 
-        ''' 
-        Loop usado para manter a conexão caso o usuário queira mais arquivos.
-        '''
+def conexoes(connectionSocket, addr):  
+        
+        #Loop usado para manter a conexão caso o usuário queira mais arquivos.
         while True:
-                nameMusic = connectionSocket.recv(4096)
-                nameMusic = nameMusic.decode('utf-8')
+                nameMusic = connectionSocket.recv(4096).decode('utf-8')
 
                 if nameMusic == "Sair":
                         connectionSocket.close()
+                        print("Conexão encerrada com {}".format(addr))
+                        break
                 
-                resposta = vea(nameMusic)
-                print(resposta)
-
-                if resposta == True:
-                        musica = open('/home/felipe/Música/{}'.format(nameMusic), 'rb')
-                        print(type(musica))
+                if vea(nameMusic) == True:
+                        musica = wave.open('/home/felipe/Música/{}'.format(nameMusic),'rb')
+                        
                         '''
-                        Enviando cada linha do arquivo para o cliente.
-                        Neste for a variável campos é iterada com o resultado de .readlines(), ou seja, este for será
-                        executado até que cada linha do arquivo seja lida.
+                        Convertendo o valor da taxa de reprodução(rate) que é um inteiro
+                        para string para poder enviar pelo socket.
                         '''
-                        for linha in musica:
-                                #print(linha)
-                                connectionSocket.send(linha)    
+                        rate = str(musica.getframerate())
+                        
+                        #Enviando a taxa de reprodução para o cliente.
+                        connectionSocket.send(rate.encode('utf-8'))
+                
+                        time.sleep(1.5)
+                        while musica != '':
+                                connectionSocket.send(musica.readframes(4096))    
 
                         musica.close()
                         #Será usado se não conseguir integrar uma página html.
                         connectionSocket.close() 
                 else:
-                        falso = "Falso"
-                        connectionSocket.send(falso.encode('utf-8'))
+                        #falso = "Falso"
+                        #connectionSocket.send(falso.encode('utf-8'))
+                        break
 
-                break
+                #break <- tenho que voltar depois 
                 
                 
 
 def main():
     while True:
         connectionSocket, addr = serverSocket.accept()
-        print("Conexão vinda de {}".format(addr))
+        print("Conexão   vinda   de  {}".format(addr))
         th = threading.Thread(target=conexoes, args=(connectionSocket, addr))
         th.start()
 
