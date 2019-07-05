@@ -28,19 +28,19 @@ def vea(arq_nome):
         
         return False
 
+
 def conexoes(connectionSocket, addr):  
         
         #Loop usado para manter a conexão caso o usuário queira mais arquivos.
         while True:
                 nameMusic = connectionSocket.recv(4096).decode('utf-8')
-
-                if nameMusic == "Sair":
+                if nameMusic == "q":
                         connectionSocket.close()
                         print("Conexão encerrada com {}".format(addr))
-                        break
+                        exit()
                 
-                if vea(nameMusic) == True:
-                        musica = wave.open('/home/felipe/Música/{}'.format(nameMusic),'rb')
+                if vea(nameMusic+'.wav') == True:
+                        musica = wave.open('/home/felipe/Música/{}.wav'.format(nameMusic),'rb')
                         
                         '''
                         Convertendo o valor da taxa de reprodução(rate) que é um inteiro
@@ -57,15 +57,12 @@ def conexoes(connectionSocket, addr):
 
                         musica.close()
                         #Será usado se não conseguir integrar uma página html.
-                        connectionSocket.close() 
-                else:
-                        #falso = "Falso"
-                        #connectionSocket.send(falso.encode('utf-8'))
-                        break
+                        print("Conexão encerrada com {}".format(addr))
+                        connectionSocket.close()
 
-                #break <- tenho que voltar depois 
-                
-                
+                else:
+                        falso = "Falso"
+                        connectionSocket.send(falso.encode('utf-8'))
 
 def main():
     while True:
@@ -73,6 +70,7 @@ def main():
         print("Conexão   vinda   de  {}".format(addr))
         th = threading.Thread(target=conexoes, args=(connectionSocket, addr))
         th.start()
+        time.sleep(5)
 
 if __name__ == '__main__':
 	main()
